@@ -20,13 +20,11 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
   const TTL = (options || {}).ttl || defaultTTL;
 
   const processIncomingOperation = (operation: Operation): Operation => {
-    console.warn(`processIncomingOperation: key: ${operation.key}, policy: ${operation.context.requestPolicy}, kind: ${operation.kind}`);
     if (
       operation.kind !== 'query' ||
       (operation.context.requestPolicy !== 'cache-first' &&
         operation.context.requestPolicy !== 'cache-only')
     ) {
-      // console.warn('not upgrading', operation.context.requestPolicy, operation.kind);
       return operation;
     }
 
@@ -36,7 +34,6 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
       currentTime - lastOccurrence > TTL &&
       (!options.shouldUpgrade || options.shouldUpgrade(operation))
     ) {
-      // console.warn('upgrading', operation.context.requestPolicy, operation.kind);
       return makeOperation(operation.kind, operation, {
         ...operation.context,
         requestPolicy: 'cache-and-network',
@@ -48,13 +45,7 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
 
   const processIncomingResults = (result: OperationResult): void => {
     const meta = result.operation.context.meta;
-    const isMiss =
-      !operations.has(result.operation.key) ||
-      !meta ||
-      meta.cacheOutcome === 'miss';
-    const { operation } = result;
-    console.warn(`processIncomingResults: key: ${operation.key}, policy: ${operation.context.requestPolicy}, kind: ${operation.kind}`);
-
+    const isMiss = !meta || meta.cacheOutcome === 'miss';
     if (isMiss) {
       operations.set(result.operation.key, new Date().getTime());
     }

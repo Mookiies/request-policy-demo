@@ -6,7 +6,7 @@ import {
   Provider
 } from "urql";
 
-import { requestPolicyExchange } from "@urql/exchange-request-policy";
+import { requestPolicyExchange } from "./requestPolicyExchange";
 import { offlineExchange } from "@urql/exchange-graphcache";
 import { makeDefaultStorage } from "@urql/exchange-graphcache/default-storage";
 import { Todos } from "./components";
